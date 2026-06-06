@@ -21,7 +21,7 @@ export default function ReceptionistLogin() {
     setError("");
 
     try {
-      const res = await fetch("http://localhost:5000/api/login", {
+      const res = await fetch("https://ar-hospital-backend-hqagfqdbbxguehdb.centralindia-01.azurewebsites.net/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password, role: "RECEPTIONIST" })

@@ -76,7 +76,7 @@ export default function ReceptionistDashboard() {
       formData.append("billPdf", selectedFile);
 
       try {
-        const response = await fetch("http://localhost:5000/api/upload-bill", {
+        const response = await fetch("https://ar-hospital-backend-hqagfqdbbxguehdb.centralindia-01.azurewebsites.net/api/upload-bill", {
           method: "POST",
           body: formData,
         });
@@ -101,7 +101,7 @@ export default function ReceptionistDashboard() {
     if (!patientData || !selectedDoctor || !selectedOPD) return;
 
     try {
-      const response = await fetch(`http://localhost:5000/api/patients/${patientData.PatientID}/route`, {
+      const response = await fetch(`https://ar-hospital-backend-hqagfqdbbxguehdb.centralindia-01.azurewebsites.net/api/patients/${patientData.PatientID}/route`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ConsultingDoctor: selectedDoctor, OPDNumber: selectedOPD, Specialization: selectedSpecialization, IsEmergency: isEmergency }),
@@ -157,7 +157,7 @@ export default function ReceptionistDashboard() {
     if (!validateForm()) return;
     
     try {
-      const response = await fetch("http://localhost:5000/api/patients/draft", {
+      const response = await fetch("https://ar-hospital-backend-hqagfqdbbxguehdb.centralindia-01.azurewebsites.net/api/patients/draft", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(manualData),

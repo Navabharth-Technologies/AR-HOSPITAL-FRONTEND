@@ -45,7 +45,7 @@ export default function OPDDashboard() {
   }, [opdNumber]);
 
   useEffect(() => {
-    const newSocket = io("http://localhost:5000");
+    const newSocket = io("https://ar-hospital-backend-hqagfqdbbxguehdb.centralindia-01.azurewebsites.net");
     setSocket(newSocket);
 
     return () => {
@@ -90,7 +90,7 @@ export default function OPDDashboard() {
 
   const fetchPatients = async () => {
     try {
-      const res = await fetch(`http://localhost:5000/api/patients/opd/${opdNumber}`);
+      const res = await fetch(`https://ar-hospital-backend-hqagfqdbbxguehdb.centralindia-01.azurewebsites.net/api/patients/opd/${opdNumber}`);
       const data = await res.json();
       if (data.success) {
         setPatients(data.patients);
@@ -106,7 +106,7 @@ export default function OPDDashboard() {
     
     const checkStatus = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/opd/${opdNumber}/status`);
+        const res = await fetch(`https://ar-hospital-backend-hqagfqdbbxguehdb.centralindia-01.azurewebsites.net/api/opd/${opdNumber}/status`);
         const data = await res.json();
         if (data.success) {
           setDoctorStatus(data.status);
@@ -122,7 +122,7 @@ export default function OPDDashboard() {
 
   const updateStatus = async (id: number, status: string) => {
     try {
-      await fetch(`http://localhost:5000/api/patients/${id}/status`, {
+      await fetch(`https://ar-hospital-backend-hqagfqdbbxguehdb.centralindia-01.azurewebsites.net/api/patients/${id}/status`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status })
@@ -139,11 +139,11 @@ export default function OPDDashboard() {
     setShowOTMenu(false);
 
     if (status === "OT") {
-      fetch(`http://localhost:5000/api/opd/${opdNumber}/cancel-ot-timer`, { method: "POST" });
+      fetch(`https://ar-hospital-backend-hqagfqdbbxguehdb.centralindia-01.azurewebsites.net/api/opd/${opdNumber}/cancel-ot-timer`, { method: "POST" });
     }
 
     try {
-      await fetch(`http://localhost:5000/api/opd/${opdNumber}/status`, {
+      await fetch(`https://ar-hospital-backend-hqagfqdbbxguehdb.centralindia-01.azurewebsites.net/api/opd/${opdNumber}/status`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: "AVAILABLE" })
@@ -155,7 +155,7 @@ export default function OPDDashboard() {
 
   const handleCallNext = async () => {
     try {
-      await fetch(`http://localhost:5000/api/opd/${opdNumber}/call-next`, {
+      await fetch(`https://ar-hospital-backend-hqagfqdbbxguehdb.centralindia-01.azurewebsites.net/api/opd/${opdNumber}/call-next`, {
         method: "POST"
       });
     } catch (error) {
@@ -202,11 +202,11 @@ export default function OPDDashboard() {
     setShowOTMenu(false);
 
     if (targetStatus === "AVAILABLE" && doctorStatus === "OT") {
-      fetch(`http://localhost:5000/api/opd/${opdNumber}/cancel-ot-timer`, { method: "POST" });
+      fetch(`https://ar-hospital-backend-hqagfqdbbxguehdb.centralindia-01.azurewebsites.net/api/opd/${opdNumber}/cancel-ot-timer`, { method: "POST" });
     }
 
     try {
-      await fetch(`http://localhost:5000/api/opd/${opdNumber}/status`, {
+      await fetch(`https://ar-hospital-backend-hqagfqdbbxguehdb.centralindia-01.azurewebsites.net/api/opd/${opdNumber}/status`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: targetStatus })
@@ -218,7 +218,7 @@ export default function OPDDashboard() {
 
   const submitOTTimer = async () => {
     try {
-      const res = await fetch(`http://localhost:5000/api/opd/${otOpd}/ot-timer`, {
+      const res = await fetch(`https://ar-hospital-backend-hqagfqdbbxguehdb.centralindia-01.azurewebsites.net/api/opd/${otOpd}/ot-timer`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ durationMinutes: otDuration })

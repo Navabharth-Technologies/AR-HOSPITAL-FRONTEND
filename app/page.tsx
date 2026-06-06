@@ -16,7 +16,7 @@ export default function Home() {
 
   const handleTVMode = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/start-ar-display', {
+      const res = await fetch('https://ar-hospital-backend-hqagfqdbbxguehdb.centralindia-01.azurewebsites.net/api/start-ar-display', {
         method: 'POST'
       });
       const data = await res.json();
