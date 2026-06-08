@@ -245,7 +245,7 @@ export default function OPDDashboard() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 font-sans selection:bg-teal-500/30">
+    <div className="min-h-[100dvh] w-full overflow-x-hidden flex flex-col bg-slate-50 text-slate-900 font-sans selection:bg-teal-500/30">
       
       {/* Abstract Background Elements */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
@@ -359,7 +359,7 @@ export default function OPDDashboard() {
             </div>
           </div>
 
-          <div className="h-8 w-px bg-slate-200"></div>
+          <div className="hidden xl:block h-8 w-px bg-slate-200"></div>
 
           <Link href="/">
             <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="p-3 bg-red-50 text-red-500 rounded-xl hover:bg-red-100 transition-colors border border-red-200">
@@ -370,7 +370,7 @@ export default function OPDDashboard() {
       </nav>
 
       {/* Main Content */}
-      <main className="flex-1 p-4 md:p-8 max-w-5xl mx-auto w-full relative z-10">
+      <main className="flex-1 p-4 sm:p-6 md:p-8 max-w-5xl mx-auto w-full relative z-10">
         
         {/* Status Banners */}
         {doctorStatus === "OT" && (
@@ -395,7 +395,7 @@ export default function OPDDashboard() {
         <div className="relative">
           {/* Vertical Timeline Line */}
           {patients.length > 1 && (
-            <div className="absolute left-8 top-24 bottom-24 w-0.5 bg-slate-200 z-0"></div>
+            <div className="hidden md:block absolute left-8 top-24 bottom-24 w-0.5 bg-slate-200 z-0"></div>
           )}
 
           <div className="grid grid-cols-1 gap-6 relative z-10">
@@ -449,7 +449,7 @@ export default function OPDDashboard() {
                         )}
                       </div>
                       
-                      <h3 className={`text-2xl font-bold tracking-wide mb-1 ${patient.IsEmergency ? 'text-red-600' : 'text-slate-900'}`}>
+                      <h3 className={`text-xl sm:text-2xl font-bold tracking-wide mb-1 ${patient.IsEmergency ? 'text-red-600' : 'text-slate-900'}`}>
                         {patient.PatientName}
                       </h3>
                       
@@ -465,7 +465,7 @@ export default function OPDDashboard() {
                     </div>
 
                     {/* Action Controls */}
-                    <div className="flex items-center space-x-3 mt-6 md:mt-0 w-full md:w-auto justify-end">
+                    <div className="flex flex-wrap items-center gap-2 mt-6 md:mt-0 w-full md:w-auto justify-end">
                       {patient.QueueStatus === 'HOLD' ? (
                         <motion.button
                           whileHover={{ scale: (doctorStatus !== "AVAILABLE" && !patient.IsActive) ? 1 : 1.05 }} whileTap={{ scale: (doctorStatus !== "AVAILABLE" && !patient.IsActive) ? 1 : 0.95 }}
@@ -474,7 +474,7 @@ export default function OPDDashboard() {
                             if (doctorStatus !== "AVAILABLE" && !patient.IsActive) return;
                             updateStatus(patient.PatientID, 'UNHOLD');
                           }}
-                          className={`bg-white border px-5 py-3 rounded-xl flex flex-col items-center space-y-1 w-24 shadow-sm transition-all ${(doctorStatus !== "AVAILABLE" && !patient.IsActive) ? "opacity-50 cursor-not-allowed grayscale border-slate-200 text-slate-400" : "border-green-200 text-green-600 hover:bg-green-50 hover:border-green-300"}`}
+                          className={`flex-1 sm:flex-none bg-white border px-4 sm:px-5 py-3 rounded-xl flex flex-col items-center space-y-1 sm:w-24 min-w-[80px] shadow-sm transition-all ${(doctorStatus !== "AVAILABLE" && !patient.IsActive) ? "opacity-50 cursor-not-allowed grayscale border-slate-200 text-slate-400" : "border-green-200 text-green-600 hover:bg-green-50 hover:border-green-300"}`}
                         >
                           <PlayCircle className="w-5 h-5" />
                           <span className="text-[9px] font-bold tracking-widest uppercase">RESUME</span>
@@ -487,7 +487,7 @@ export default function OPDDashboard() {
                             if (doctorStatus !== "AVAILABLE" && !patient.IsActive) return;
                             updateStatus(patient.PatientID, 'HOLD');
                           }}
-                          className={`bg-white border px-5 py-3 rounded-xl flex flex-col items-center space-y-1 w-24 shadow-sm transition-all ${(doctorStatus !== "AVAILABLE" && !patient.IsActive) ? "opacity-50 cursor-not-allowed grayscale border-slate-200 text-slate-400" : "border-amber-200 text-amber-600 hover:bg-amber-50 hover:border-amber-300"}`}
+                          className={`flex-1 sm:flex-none bg-white border px-4 sm:px-5 py-3 rounded-xl flex flex-col items-center space-y-1 sm:w-24 min-w-[80px] shadow-sm transition-all ${(doctorStatus !== "AVAILABLE" && !patient.IsActive) ? "opacity-50 cursor-not-allowed grayscale border-slate-200 text-slate-400" : "border-amber-200 text-amber-600 hover:bg-amber-50 hover:border-amber-300"}`}
                         >
                           <PauseCircle className="w-5 h-5" />
                           <span className="text-[9px] font-bold tracking-widest uppercase">HOLD</span>
@@ -501,7 +501,7 @@ export default function OPDDashboard() {
                           if (doctorStatus !== "AVAILABLE" && !patient.IsActive) return;
                           updateStatus(patient.PatientID, 'CANCELLED');
                         }}
-                        className={`bg-white border px-5 py-3 rounded-xl flex flex-col items-center space-y-1 w-24 shadow-sm transition-all ${(doctorStatus !== "AVAILABLE" && !patient.IsActive) ? "opacity-50 cursor-not-allowed grayscale border-slate-200 text-slate-400" : "border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300"}`}
+                        className={`flex-1 sm:flex-none bg-white border px-4 sm:px-5 py-3 rounded-xl flex flex-col items-center space-y-1 sm:w-24 min-w-[80px] shadow-sm transition-all ${(doctorStatus !== "AVAILABLE" && !patient.IsActive) ? "opacity-50 cursor-not-allowed grayscale border-slate-200 text-slate-400" : "border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300"}`}
                       >
                         <XCircle className="w-5 h-5" />
                         <span className="text-[9px] font-bold tracking-widest uppercase">CANCEL</span>
@@ -514,7 +514,7 @@ export default function OPDDashboard() {
                           if (doctorStatus !== "AVAILABLE" && !patient.IsActive) return;
                           updateStatus(patient.PatientID, 'COMPLETED');
                         }}
-                        className={`border px-5 py-3 rounded-xl flex flex-col items-center space-y-1 w-24 transition-all ${(doctorStatus !== "AVAILABLE" && !patient.IsActive) ? "opacity-50 cursor-not-allowed grayscale bg-slate-300 border-slate-400 text-slate-500" : "bg-teal-600 border-teal-700 text-white hover:bg-teal-700 shadow-md shadow-teal-600/20"}`}
+                        className={`flex-1 sm:flex-none border px-4 sm:px-5 py-3 rounded-xl flex flex-col items-center space-y-1 sm:w-24 min-w-[80px] transition-all ${(doctorStatus !== "AVAILABLE" && !patient.IsActive) ? "opacity-50 cursor-not-allowed grayscale bg-slate-300 border-slate-400 text-slate-500" : "bg-teal-600 border-teal-700 text-white hover:bg-teal-700 shadow-md shadow-teal-600/20"}`}
                       >
                         <CheckCircle className="w-5 h-5" />
                         <span className="text-[9px] font-bold tracking-widest uppercase">COMPLETE</span>

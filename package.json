@@ -1,15 +1,23 @@
 {
   "name": "frontend",
   "version": "0.1.0",
-  "private": true,
+  "description": "AR Hospital OPD App",
+  "author": "NBT",
+  "main": "electron/main.js",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "build:exe": "next build && electron-builder --win"
   },
   "dependencies": {
+    "@capacitor-community/text-to-speech": "^8.0.0",
+    "@capacitor/android": "^8.4.0",
+    "@capacitor/cli": "^8.4.0",
+    "@capacitor/core": "^8.4.0",
     "clsx": "^2.1.1",
+    "electron-serve": "^3.0.1",
     "framer-motion": "^12.40.0",
     "lucide-react": "^1.17.0",
     "next": "16.2.7",
@@ -23,9 +31,26 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "electron": "^42.3.3",
+    "electron-builder": "^26.15.0",
     "eslint": "^9",
     "eslint-config-next": "16.2.7",
     "tailwindcss": "^4",
     "typescript": "^5"
+  },
+  "build": {
+    "appId": "com.arhospital.app.desktop",
+    "productName": "AR Hospital",
+    "directories": {
+      "output": "dist-desktop"
+    },
+    "win": {
+      "icon": "public/app-icon.png"
+    },
+    "files": [
+      "out/**/*",
+      "electron/**/*",
+      "package.json"
+    ]
   }
 }

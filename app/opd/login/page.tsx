@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ActivitySquare, ArrowRight, ShieldCheck, Eye, EyeOff } from "lucide-react";
+import { ActivitySquare, ArrowRight, ShieldCheck, Eye, EyeOff, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -42,7 +42,7 @@ export default function OPDLogin() {
   };
 
   return (
-    <main className="flex min-h-screen items-center justify-center relative overflow-hidden bg-slate-50">
+    <main className="flex min-h-[100dvh] items-center justify-center relative overflow-x-hidden bg-slate-50 p-4 sm:p-6 w-full">
       {/* Background decoration */}
       <div className="absolute top-[-20%] right-[-10%] w-96 h-96 bg-indigo-500/10 rounded-full blur-[100px] animate-blob" />
       <div className="absolute bottom-[-20%] left-[-10%] w-96 h-96 bg-teal-500/10 rounded-full blur-[100px] animate-blob animation-delay-2000" />
@@ -52,11 +52,14 @@ export default function OPDLogin() {
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
         whileHover={{ y: -5 }}
-        className="bg-white border border-slate-200 p-10 rounded-2xl w-full max-w-md z-10 flex flex-col space-y-8 shadow-xl hover:shadow-2xl hover:border-indigo-300 transition-all duration-300 relative overflow-hidden"
+        className="bg-white border border-slate-200 p-6 sm:p-10 rounded-2xl w-full max-w-md z-10 flex flex-col space-y-6 sm:space-y-8 shadow-xl hover:shadow-2xl hover:border-indigo-300 transition-all duration-300 relative overflow-hidden mx-auto"
       >
         <div className="absolute inset-0 bg-gradient-to-bl from-white via-slate-50 to-indigo-50/50 opacity-70 z-0"></div>
         <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-indigo-100 rounded-full blur-3xl opacity-60 animate-pulse-slow z-0"></div>
 
+        <Link href="/" className="absolute top-6 left-6 text-slate-400 hover:text-indigo-600 transition-colors z-20" title="Back to Home">
+          <ArrowLeft className="w-6 h-6" />
+        </Link>
         <div className="flex flex-col items-center space-y-4 relative z-10">
           <div className="p-2 bg-white rounded-full">
             <Image src="/ar-logo-new.png" width={80} height={80} alt="AR Hospital Logo" className="object-contain" />

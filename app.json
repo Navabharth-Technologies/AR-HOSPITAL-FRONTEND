@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "extra": {
+      "eas": {
+        "projectId": "db1e18f2-f6d1-4df1-a4e6-273f05397811"
+      }
+    },
+    "android": {
+      "package": "com.tejashwini_s.frontend"
+    }
+  }
+}

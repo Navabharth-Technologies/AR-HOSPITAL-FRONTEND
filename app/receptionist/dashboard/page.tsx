@@ -179,7 +179,7 @@ export default function ReceptionistDashboard() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 font-sans selection:bg-teal-500/30">
+    <div className="min-h-[100dvh] w-full overflow-x-hidden flex flex-col bg-slate-50 text-slate-900 font-sans selection:bg-teal-500/30">
       
       {/* Abstract Background Elements */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
@@ -205,7 +205,7 @@ export default function ReceptionistDashboard() {
             <p className="text-sm font-medium text-slate-700">Welcome, Control Admin</p>
             <p className="text-xs text-slate-500 font-mono tracking-wider">{currentTime || "SYNCING..."}</p>
           </div>
-          <div className="h-8 w-px bg-slate-200"></div>
+          <div className="hidden md:block h-8 w-px bg-slate-200"></div>
           <Link href="/">
             <motion.button 
               whileHover={{ scale: 1.05 }} 
@@ -219,7 +219,7 @@ export default function ReceptionistDashboard() {
       </nav>
 
       {/* Main Content */}
-      <main className="flex-1 p-4 md:p-8 grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 max-w-[1400px] mx-auto w-full z-10">
+      <main className="flex-1 p-4 sm:p-6 md:p-8 grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 max-w-[1400px] mx-auto w-full z-10">
         
         {/* Left Column: Upload or Manual Entry */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, ease: "easeOut" }} className="flex flex-col space-y-6">
@@ -255,7 +255,7 @@ export default function ReceptionistDashboard() {
                   />
                   {formErrors.PatientName && <p className="text-red-500 text-xs mt-1 ml-2 font-medium">{formErrors.PatientName}</p>}
                 </div>
-                <div className="grid grid-cols-2 gap-5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
                   <select required value={manualData.Gender} onChange={e => setManualData({...manualData, Gender: e.target.value})} className="w-full bg-white border border-slate-200 rounded-xl px-5 py-4 text-slate-900 focus:outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10 transition-all appearance-none cursor-pointer shadow-sm">
                     <option value="" disabled hidden>Gender</option>
                     <option value="Male">Male</option>
@@ -393,7 +393,7 @@ export default function ReceptionistDashboard() {
                     </div>
                   </div>
 
-                  <div className="w-full bg-white rounded-xl p-6 border border-slate-200 text-left grid grid-cols-2 gap-y-6 gap-x-4 shadow-sm">
+                  <div className="w-full bg-white rounded-xl p-6 border border-slate-200 text-left grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-y-6 shadow-sm">
                     <div>
                       <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-1">Age / Gender</p>
                       <p className="text-slate-800 font-medium">{patientData.Age} yrs • {patientData.Gender}</p>
@@ -408,7 +408,7 @@ export default function ReceptionistDashboard() {
                     </div>
                   </div>
 
-                  <div className="w-full bg-green-50 border border-green-200 text-green-600 rounded-xl py-4 text-sm font-bold tracking-widest text-center shadow-sm">
+                  <div className="w-full bg-green-50 border border-green-200 text-green-600 rounded-xl py-4 text-xs sm:text-sm font-bold tracking-widest text-center shadow-sm">
                     SUCCESSFULLY DISPATCHED TO QUEUE
                   </div>
                 </motion.div>
@@ -418,8 +418,8 @@ export default function ReceptionistDashboard() {
                   initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} 
                   className="w-full flex flex-col space-y-8"
                 >
-                  <div className="w-full bg-white rounded-2xl p-6 border border-slate-200 grid grid-cols-2 gap-y-6 gap-x-4 shadow-sm">
-                    <div className="col-span-2 border-b border-slate-100 pb-4">
+                  <div className="w-full bg-white rounded-2xl p-6 border border-slate-200 grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-y-6 shadow-sm">
+                    <div className="col-span-1 sm:col-span-2 border-b border-slate-100 pb-4">
                       <p className="text-[10px] text-teal-600 uppercase tracking-widest font-bold mb-1">Patient Name</p>
                       <p className="text-2xl font-bold text-slate-900">{patientData.PatientName}</p>
                     </div>
@@ -470,7 +470,7 @@ export default function ReceptionistDashboard() {
                         </select>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="relative">
                           <label className="text-[10px] text-slate-500 uppercase tracking-widest font-bold ml-1 mb-1 block">OPD Destination</label>
                           <select required value={selectedOPD} onChange={(e) => setSelectedOPD(e.target.value)} className="w-full bg-white border border-slate-300 rounded-xl px-4 py-4 text-slate-900 focus:outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10 transition-all appearance-none cursor-pointer shadow-sm font-medium">

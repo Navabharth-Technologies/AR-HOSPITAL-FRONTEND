@@ -1,0 +1,614 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;800&display=swap');
+
+:root {
+  --bg-color: #4a4a4a;
+  --card-bg: rgba(50, 50, 50, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --text-primary: #ffffff;
+  --text-secondary: #a0a0a0;
+  --accent-blue: #8c1538;
+  /* Maroon from logo */
+  --accent-glow: rgba(140, 21, 56, 0.6);
+  --accent-green: #00ff88;
+  --danger: #ff3366;
+  --font-primary: 'Inter', sans-serif;
+  --font-display: 'Outfit', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-primary);
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+}
+
+#root {
+  height: 100%;
+  width: 100%;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: row;
+  /* Changed to row for left-right split */
+  height: 100vh;
+  width: 100vw;
+  position: relative;
+}
+
+/* LEFT SECTION - OPD 1 */
+.left-sidebar {
+  flex: 0 0 30%;
+  background: var(--bg-color);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem 2.5rem;
+  position: relative;
+  border-right: 1px solid var(--glass-border);
+  box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+}
+
+.left-sidebar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: -2px;
+  width: 2px;
+  height: 100%;
+  background: linear-gradient(180deg, transparent, var(--accent-blue), transparent);
+  opacity: 0.5;
+}
+
+/* RIGHT SECTION - OPD 2 & 3 */
+.right-sidebar {
+  flex: 0 0 30%;
+  background: var(--bg-color);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem 2.5rem;
+  position: relative;
+  border-left: 1px solid var(--glass-border);
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+}
+
+.right-sidebar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -2px;
+  width: 2px;
+  height: 100%;
+  background: linear-gradient(180deg, transparent, var(--accent-blue), transparent);
+  opacity: 0.5;
+}
+
+/* Specific Minimization for OPD 2 & 3 to fit screen */
+.right-sidebar .opd-panel {
+  padding: 1.2rem;
+}
+
+.right-sidebar .department-name {
+  font-size: 1.1rem;
+}
+
+.right-sidebar .token-number {
+  font-size: 2.8rem;
+  margin-bottom: 0.3rem;
+}
+
+.right-sidebar .status-badge {
+  padding: 0.25rem 0.75rem;
+  font-size: 0.85rem;
+}
+
+.right-sidebar .queue-extended {
+  padding-top: 0.75rem;
+}
+
+.right-sidebar .queue-header {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.right-sidebar .queue-items {
+  gap: 0.5rem;
+}
+
+.right-sidebar .queue-item {
+  padding: 0.6rem 0.8rem;
+}
+
+.right-sidebar .q-token {
+  font-size: 1.3rem;
+  width: 55px;
+}
+
+.right-sidebar .q-name {
+  font-size: 1.1rem;
+}
+
+.right-sidebar .token-display {
+  margin: 0.5rem 0;
+}
+
+/* QR Code Section */
+.qr-container {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: auto;
+  margin-bottom: 0.5rem;
+  flex: 0 0 auto;
+}
+
+.qr-dummy {
+  width: 120px;
+  height: 120px;
+  background-color: white;
+  border: 2px dashed var(--accent-blue);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.left-sidebar .qr-dummy {
+  width: 175px;
+  height: 175px;
+}
+
+.hospital-branding {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+}
+
+.hospital-logo {
+  width: 100px;
+  height: 100px;
+  background: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+.left-sidebar .hospital-logo {
+  border: 3px solid #FFD700;
+  /* Gold border */
+}
+
+.right-sidebar .hospital-logo {
+  border: 3px solid var(--accent-blue);
+  /* Original border */
+}
+
+.hospital-name {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 800;
+  text-align: center;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+  letter-spacing: 1px;
+}
+
+.left-sidebar .hospital-name {
+  color: #FFD700;
+  /* Gold color */
+  text-transform: uppercase;
+  font-size: 1.9rem;
+}
+
+.right-sidebar .hospital-name {
+  color: #FFFFFF;
+  /* Single color */
+}
+
+.queue-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  flex: 1;
+  min-height: 0;
+  justify-content: flex-start;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.left-sidebar .queue-list {
+  margin-top: 3.5rem;
+}
+
+.opd-panel {
+  background: #ffffff;
+  --text-primary: #333333;
+  --text-secondary: #666666;
+  --glass-border: rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 15px;
+  padding: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 auto;
+  height: fit-content;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.opd-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(180deg, var(--accent-blue), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.opd-panel.active-calling {
+  box-shadow: 0 0 40px var(--accent-glow);
+  border-color: var(--accent-blue);
+  transform: translateX(5px);
+}
+
+.opd-panel.active-calling::before {
+  opacity: 1;
+}
+
+.opd-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.25rem;
+}
+
+.department-name {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--accent-blue);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.status-badge {
+  background: rgba(0, 255, 136, 0.1);
+  color: var(--accent-green);
+  padding: 0.35rem 1rem;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  border: 1px solid rgba(0, 255, 136, 0.2);
+  animation: pulse 2s infinite;
+}
+
+.status-badge.serving {
+  background: #10b981;
+  /* Emerald green background */
+  color: #ffffff;
+  border-color: #10b981;
+  animation: none;
+}
+
+.token-display {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.25rem 0;
+}
+
+.current-token-area {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-right: 1px solid var(--glass-border);
+  padding-right: 1rem;
+}
+
+.token-label {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 0.25rem;
+}
+
+.token-number {
+  font-family: var(--font-display);
+  font-size: 3.5rem;
+  font-weight: 800;
+  line-height: 1;
+  background: linear-gradient(to right, #333333, var(--accent-blue));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 0.25rem;
+}
+
+.active-calling .token-number {
+  animation: textGlow 1.5s alternate infinite;
+}
+
+.patient-name {
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.next-token-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-left: 0.5rem;
+}
+
+.next-token-area .token-number {
+  font-size: 1.5rem;
+  background: var(--text-secondary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 0.25rem;
+}
+
+.next-token-area .patient-name {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.left-sidebar .current-token-area {
+  border-right: none;
+  padding-right: 0;
+}
+
+/* EXTENDED QUEUE LIST (OPD 1) */
+.queue-extended {
+  margin-top: auto;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--glass-border);
+}
+
+.queue-header {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 0.5rem;
+}
+
+.queue-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.queue-item {
+  display: flex;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.03);
+  padding: 0.5rem 0.8rem;
+  border-radius: 8px;
+  border: 1px solid var(--glass-border);
+}
+
+.queue-item.empty {
+  justify-content: center;
+  color: var(--text-secondary);
+  font-style: italic;
+  padding: 1.5rem;
+}
+
+.q-token {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--accent-blue);
+  width: auto;
+  min-width: 80px;
+  text-align: left;
+  border-right: 1px solid var(--glass-border);
+  margin-right: 0.8rem;
+  padding-right: 0.8rem;
+}
+
+.q-name {
+  font-size: 1.3rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+}
+
+/* CENTER SECTION - VIDEO LOOP */
+.video-section {
+  flex: 0 0 40%;
+  position: relative;
+  overflow: hidden;
+  background-color: #000;
+}
+
+.bg-video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  transition: opacity 1s ease-in-out;
+}
+
+.video-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.speaker-icon {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  color: var(--accent-blue);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.active-calling .speaker-icon {
+  opacity: 1;
+  animation: pulseIcon 1.5s infinite;
+}
+
+.test-btn {
+  background: rgba(10, 20, 40, 0.8);
+  border: 1px solid var(--glass-border);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  font-family: var(--font-primary);
+  font-weight: 600;
+  transition: all 0.2s ease;
+  font-size: 0.8rem;
+}
+
+.test-btn:hover {
+  background: rgba(0, 210, 255, 0.15);
+  border-color: var(--accent-blue);
+}
+
+/* ANIMATIONS */
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 255, 136, 0.4);
+  }
+
+  70% {
+    box-shadow: 0 0 0 10px rgba(0, 255, 136, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 255, 136, 0);
+  }
+}
+
+@keyframes textGlow {
+  from {
+    text-shadow: 0 0 10px rgba(0, 210, 255, 0.2);
+  }
+
+  to {
+    text-shadow: 0 0 20px rgba(0, 210, 255, 0.8), 0 0 30px rgba(0, 210, 255, 0.6);
+  }
+}
+
+@keyframes pulseIcon {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+}
+
+.slide-up {
+  animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideUp {
+  0% {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.test-controls {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 100;
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 1024px) {
+  .app-container {
+    flex-direction: column;
+    height: auto;
+    min-height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  .left-sidebar,
+  .right-sidebar {
+    flex: none;
+    width: 100%;
+    height: auto;
+    border-right: none;
+    border-left: none;
+    border-bottom: 1px solid var(--glass-border);
+  }
+
+  .video-section {
+    flex: none;
+    width: 100%;
+    height: 30vh;
+    min-height: 250px;
+    order: -1;
+    /* Move video to the top on mobile/tablet portrait */
+  }
+
+  .qr-container {
+    flex-wrap: wrap;
+  }
+}
