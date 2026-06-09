@@ -21,11 +21,13 @@ export default function ARDisplay() {
   const prevCurrents = useRef({});
   const fadeIntervalRef = useRef(null);
   const speakingCountRef = useRef(0);
+  const prevIndexRef = useRef(-1);
 
   useEffect(() => {
     const int = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(int);
   }, []);
+
 
   const formatTimeLeft = (endTimeMs) => {
     const diff = Math.max(0, Math.floor((endTimeMs - now) / 1000));
@@ -49,7 +51,7 @@ export default function ARDisplay() {
       }
       setScale(newScale);
     };
-    
+
     updateScale();
     window.addEventListener('resize', updateScale);
     return () => window.removeEventListener('resize', updateScale);
@@ -97,7 +99,7 @@ export default function ARDisplay() {
   };
 
   const handleFileUpload = (e) => {
-     // Ignored since we are using live db now
+    // Ignored since we are using live db now
   };
 
   const formatNameForTTS = (name) => {
@@ -109,13 +111,13 @@ export default function ARDisplay() {
     const activeVideo = videoRefs.current[currentVideoIndex];
     if (!activeVideo) return;
     if (fadeIntervalRef.current) clearInterval(fadeIntervalRef.current);
-    
+
     const startVolume = activeVideo.volume;
     const change = targetVolume - startVolume;
     const steps = 20;
     const stepTime = durationMs / steps;
     let currentStep = 0;
-    
+
     fadeIntervalRef.current = setInterval(() => {
       currentStep++;
       if (videoRefs.current[currentVideoIndex]) {
@@ -127,7 +129,7 @@ export default function ARDisplay() {
         clearInterval(fadeIntervalRef.current);
         fadeIntervalRef.current = null;
         if (videoRefs.current[currentVideoIndex]) {
-           videoRefs.current[currentVideoIndex].volume = targetVolume;
+          videoRefs.current[currentVideoIndex].volume = targetVolume;
         }
       }
     }, stepTime);
@@ -136,37 +138,37 @@ export default function ARDisplay() {
   const announceToken = async (token, patient, department, specialization, opdNumber, gender) => {
     let destination = opdNumber;
     const formattedPatientName = formatNameForTTS(patient);
-    
+
     let title = "";
     const lowerName = formattedPatientName.toLowerCase();
     if (!lowerName.startsWith("mr.") && !lowerName.startsWith("mrs.") && !lowerName.startsWith("ms.") && !lowerName.startsWith("miss ") && !lowerName.startsWith("mr ") && !lowerName.startsWith("mrs ")) {
       if (gender === "Male") title = "Mr. ";
       else if (gender === "Female") title = "Mrs. ";
     }
-    
+
     const textToSpeak = `Token ${token}, ${title}${formattedPatientName}, please proceed to ${destination}.`;
 
     speakingCountRef.current += 1;
     fadeAudio(0.02, 500); // fade out video almost completely to 2%
 
     const onSpeakEnd = () => {
-       speakingCountRef.current -= 1;
-       if (speakingCountRef.current <= 0) {
-          speakingCountRef.current = 0;
-          fadeAudio(0.3, 2000); // fade back to 30% over 2 seconds
-       }
+      speakingCountRef.current -= 1;
+      if (speakingCountRef.current <= 0) {
+        speakingCountRef.current = 0;
+        fadeAudio(0.3, 2000); // fade back to 30% over 2 seconds
+      }
     };
 
     let isNativeCapacitor = false;
     let capTextToSpeech = null;
-    
+
     if (typeof window !== 'undefined') {
       try {
         const { Capacitor } = await import('@capacitor/core');
         isNativeCapacitor = Capacitor.isNativePlatform();
         if (isNativeCapacitor) {
-           const ttsModule = await import('@capacitor-community/text-to-speech');
-           capTextToSpeech = ttsModule.TextToSpeech;
+          const ttsModule = await import('@capacitor-community/text-to-speech');
+          capTextToSpeech = ttsModule.TextToSpeech;
         }
       } catch (e) {
         console.error("Failed to load Capacitor TTS dynamically", e);
@@ -190,9 +192,9 @@ export default function ARDisplay() {
     } else if ('speechSynthesis' in window) {
       const msg = new SpeechSynthesisUtterance();
       msg.text = textToSpeak;
-      
+
       window.speechSynthesis.cancel(); // Clear any stuck Android TTS queues
-      
+
       const voices = window.speechSynthesis.getVoices();
       if (voices && voices.length > 0) {
         const preferredVoice = voices.find(v => v.lang.includes('en-IN') || v.name.includes('India') || v.name.includes('Indian')) || voices.find(v => v.name.includes('Google UK English Male') || v.name.includes('en-GB') || v.name.includes('en-US'));
@@ -204,7 +206,7 @@ export default function ARDisplay() {
 
       msg.onend = onSpeakEnd;
       msg.onerror = onSpeakEnd;
-      
+
       window.speechSynthesis.speak(msg);
     } else {
       onSpeakEnd();
@@ -217,16 +219,16 @@ export default function ARDisplay() {
         const res = await fetch(`https://ar-hospital-backend-hqagfqdbbxguehdb.centralindia-01.azurewebsites.net/api/patients/opd/${dep.opdNumber}`);
         const data = await res.json();
         const patients = data.success ? data.patients : [];
-        
+
         const statusRes = await fetch(`https://ar-hospital-backend-hqagfqdbbxguehdb.centralindia-01.azurewebsites.net/api/opd/${dep.opdNumber}/status`);
         const statusData = await statusRes.json();
         const doctorStatus = statusData.success ? statusData.status : 'AVAILABLE';
-        
+
         const visiblePatients = patients.filter(p => p.QueueStatus !== 'HOLD');
-        
+
         const activePatient = visiblePatients.find(p => p.IsActive === true || p.IsActive === 1);
         let currentToken = null;
-        
+
         if (activePatient) {
           currentToken = {
             token: activePatient.IsEmergency && activePatient.EmergencyTokenNumber ? `EMR${activePatient.EmergencyTokenNumber.toString().padStart(3, '0')}` : (activePatient.OpdTokenNumber ? activePatient.OpdTokenNumber.toString() : activePatient.PatientID.toString().padStart(4, '0')),
@@ -241,9 +243,9 @@ export default function ARDisplay() {
         let isCalling = false;
 
         if (currentToken && currentToken.token !== prevCurrents.current[dep.id]) {
-           prevCurrents.current[dep.id] = currentToken.token;
-           announceToken(currentToken.token, currentToken.patientName, dep.name, currentToken.specialization, dep.opdNumber, currentToken.gender);
-           isCalling = true;
+          prevCurrents.current[dep.id] = currentToken.token;
+          announceToken(currentToken.token, currentToken.patientName, dep.name, currentToken.specialization, dep.opdNumber, currentToken.gender);
+          isCalling = true;
         }
 
         const remainingPatients = visiblePatients.filter(p => !activePatient || p.PatientID !== activePatient.PatientID);
@@ -271,12 +273,31 @@ export default function ARDisplay() {
           isCalling,
           doctor: currentToken ? currentToken.doctor : (patients.length > 0 ? patients[0].ConsultingDoctor : null),
           specialization: currentToken ? currentToken.specialization : (patients.length > 0 ? patients[0].Specialization : null),
-          doctorStatus
+          doctorStatus,
+          timerInfo: statusData
         };
       }));
-      
+
       setDepartments(newDeps);
-      
+
+      // Sync timers from backend on load/refresh so all devices share the state
+      setActiveTimers(prev => {
+        const syncedTimers = { ...prev };
+        let changed = false;
+        newDeps.forEach(dep => {
+          if (dep.timerInfo?.hasTimer && dep.timerInfo?.isActive && dep.timerInfo?.endTime) {
+            if (syncedTimers[dep.opdNumber] !== dep.timerInfo.endTime) {
+              syncedTimers[dep.opdNumber] = dep.timerInfo.endTime;
+              changed = true;
+            }
+          } else if (syncedTimers[dep.opdNumber]) {
+            delete syncedTimers[dep.opdNumber];
+            changed = true;
+          }
+        });
+        return changed ? syncedTimers : prev;
+      });
+
       const callingDeps = newDeps.filter(d => d.isCalling);
       if (callingDeps.length > 0) {
         setTimeout(() => {
@@ -293,11 +314,11 @@ export default function ARDisplay() {
     const socket = io("https://ar-hospital-backend-hqagfqdbbxguehdb.centralindia-01.azurewebsites.net");
     socket.on("queue_updated", fetchLivePatients);
     socket.on("doctor_status_changed", fetchLivePatients);
-    
+
     socket.on("ot_timer_started", (data) => {
       setActiveTimers(prev => ({ ...prev, [data.opdId]: data.endTime }));
     });
-    
+
     socket.on("ot_timer_ended", (data) => {
       setActiveTimers(prev => {
         const copy = { ...prev };
@@ -315,25 +336,29 @@ export default function ARDisplay() {
         const v = videoRefs.current[idx];
         if (v) {
           if (idx === currentVideoIndex) {
-            v.volume = 0.3; // Lower base video volume to 30%
+            v.volume = speakingCountRef.current > 0 ? 0.01 : 0.08; // Base volume very low to avoid irritating disparities
+            if (prevIndexRef.current !== currentVideoIndex) {
+              v.currentTime = 0;
+            }
             const playPromise = v.play();
             if (playPromise !== undefined) {
               playPromise.catch(e => console.log("Autoplay prevented or interrupted:", e));
             }
           } else {
             v.pause();
-            v.currentTime = 0;
+            // Removed v.currentTime = 0 to prevent glitching the last frame during fade-out
           }
         }
       });
+      prevIndexRef.current = currentVideoIndex;
     }
   }, [currentVideoIndex, videos]);
 
   return (
     <div style={{ width: '100vw', height: '100vh', backgroundColor: '#000', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div 
-        className="app-container" 
-        style={{ 
+      <div
+        className="app-container"
+        style={{
           width: '1920px',
           height: '1080px',
           transform: `scale(${scale})`,
@@ -343,289 +368,290 @@ export default function ARDisplay() {
       >
 
 
-      {/* Hidden file input for uploading excel */}
-      <input 
-        type="file" 
-        accept=".xlsx, .xls, .csv" 
-        ref={fileInputRef}
-        className="file-input" 
-        onChange={handleFileUpload} 
-        style={{ display: 'none' }}
-      />
+        {/* Hidden file input for uploading excel */}
+        <input
+          type="file"
+          accept=".xlsx, .xls, .csv"
+          ref={fileInputRef}
+          className="file-input"
+          onChange={handleFileUpload}
+          style={{ display: 'none' }}
+        />
 
-      {/* LEFT SECTION - OPD 1 (Orthopedics) */}
-      <div className="left-sidebar">
-        {/* New Branding for Dr. Madhuram Chowdry */}
-        <div className="hospital-branding" onClick={triggerUpload} title="Click to upload Excel">
-          <div className="hospital-logo">
-            <img src="/dr-logo2.png" alt="Dr. Madhuram Chowdry Logo" onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'block'; }} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-            <div style={{ display: 'none', color: '#8c1538', fontWeight: 'bold' }}>Dr</div>
-          </div>
-          <div className="hospital-name" style={{ fontSize: '1.5rem' }}>Dr. Madhuram Chowdry</div>
-          <div style={{ textAlign: 'center', color: '#FFD700', fontSize: '0.85rem', fontWeight: '600', marginTop: '-0.2rem', lineHeight: '1.2', textTransform: 'uppercase' }}>
-            <div>MBBS, MS-Orthopedics</div>
-            <div>Joint Replacement &amp; Spine Surgeon</div>
-          </div>
-        </div>
-
-        <div className="queue-list">
-          {departments.filter(dep => dep.id === 'ORTHOPEDICS').map((dep) => (
-            <div 
-              key={dep.id} 
-              className={`opd-panel opd-large ${dep.isCalling ? 'active-calling' : ''}`}
-            >
-              {dep.isCalling && <Volume2 className="speaker-icon" size={24} />}
-              
-              <div className="opd-header">
-                <div className="department-name">{dep.opdNumber} - {dep.name}</div>
-                <div className={`status-badge ${dep.isCalling ? '' : 'serving'}`}>
-                  {activeTimers[dep.opdNumber] ? 'DOCTOR IN OT' : (dep.doctorStatus === 'AWAY' ? 'DOCTOR IS AWAY' : (dep.doctorStatus === 'HOLIDAY' ? 'DOCTOR ON HOLIDAY' : (dep.isCalling ? 'NOW CALLING' : (dep.currentToken ? 'SERVING' : 'NO QUEUE'))))}
-                </div>
-              </div>
-
-              {activeTimers[dep.opdNumber] ? (
-                 <div className="token-display slide-up">
-                   <div className="current-token-area">
-                     <div className="token-label" style={{ color: '#ef4444' }}>DOCTOR IN OT</div>
-                     <div className="patient-name">QUEUE PAUSED</div>
-                   </div>
-                 </div>
-              ) : dep.doctorStatus === 'AWAY' ? (
-                 <div className="token-display slide-up">
-                   <div className="current-token-area">
-                     <div className="token-label" style={{ color: '#f97316' }}>DOCTOR IS AWAY</div>
-                     <div className="patient-name">QUEUE PAUSED</div>
-                   </div>
-                 </div>
-              ) : dep.doctorStatus === 'HOLIDAY' ? (
-                 <div className="token-display slide-up">
-                   <div className="current-token-area">
-                     <div className="token-label" style={{ color: '#a855f7' }}>DOCTOR ON HOLIDAY</div>
-                     <div className="patient-name" style={{ fontSize: '1.5rem' }}>NO PATIENTS CAN BE SERVED</div>
-                   </div>
-                 </div>
-              ) : (
-                <div className="token-display slide-up" key={dep.currentToken?.token || 'empty'}>
-                  <div className="current-token-area">
-                    <div className="token-label">NOW CALLING</div>
-                    <div className="token-number">{dep.currentToken ? dep.currentToken.token : '---'}</div>
-                    <div className="patient-name">{dep.currentToken ? dep.currentToken.patientName : 'Available'}</div>
-                  </div>
-                </div>
-              )}
-
-              {/* Next 5 in Queue or Timer */}
-              {activeTimers[dep.opdNumber] ? (
-                <div className="queue-extended ot-timer-container">
-                  <div className="queue-header" style={{ color: '#ef4444' }}>RESUMING IN</div>
-                  <div className="ot-timer-display" style={{ fontSize: '4rem', fontWeight: 'bold', textAlign: 'center', padding: '1rem', color: '#ef4444', fontFamily: 'monospace' }}>
-                    {formatTimeLeft(activeTimers[dep.opdNumber])}
-                  </div>
-                </div>
-              ) : (dep.doctorStatus === 'AWAY' || dep.doctorStatus === 'HOLIDAY') ? (
-                <div className="queue-extended" style={{ opacity: 0.5 }}>
-                  <div className="queue-header">UPCOMING QUEUE (PAUSED)</div>
-                  <div className="queue-items">
-                    {dep.queue.map((q, idx) => (
-                      <div key={idx} className={`queue-item slide-up ${q.isAvailable ? 'available' : ''}`} style={{ animationDelay: `${idx * 0.1}s` }}>
-                        <div className="q-token" style={{ color: q.isEmergency ? '#ef4444' : '' }}>{q.token}</div>
-                        <div className="q-name" style={{ color: q.isEmergency ? '#ef4444' : '' }}>{q.patientName}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                <div className="queue-extended">
-                  <div className="queue-header">UPCOMING QUEUE</div>
-                  <div className="queue-items">
-                    {dep.queue.map((q, idx) => (
-                      <div key={idx} className={`queue-item slide-up ${q.isAvailable ? 'available' : ''}`} style={{ animationDelay: `${idx * 0.1}s` }}>
-                        <div className="q-token" style={{ color: q.isEmergency ? '#ef4444' : '' }}>{q.token}</div>
-                        <div className="q-name" style={{ color: q.isEmergency ? '#ef4444' : '' }}>{q.patientName}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+        {/* LEFT SECTION - OPD 1 (Orthopedics) */}
+        <div className="left-sidebar">
+          {/* New Branding for Dr. Madhuram Chowdry */}
+          <div className="hospital-branding" onClick={triggerUpload} title="Click to upload Excel">
+            <div className="hospital-logo">
+              <img src="/dr-logo2.png" alt="Dr. Madhuram Chowdry Logo" onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'block'; }} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+              <div style={{ display: 'none', color: '#8c1538', fontWeight: 'bold' }}>Dr</div>
             </div>
-          ))}
-        </div>
-
-        {/* QR CODES - LEFT SIDEBAR */}
-        <div className="qr-container">
-          <div className="qr-dummy" style={{ padding: '8px' }}>
-            <img src="/qr1_left.png" alt="QR 1 Left" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+            <div className="hospital-name" style={{ fontSize: '1.5rem' }}>Dr. Madhuram Chowdry</div>
+            <div style={{ textAlign: 'center', color: '#FFD700', fontSize: '0.85rem', fontWeight: '600', marginTop: '-0.2rem', lineHeight: '1.2', textTransform: 'uppercase' }}>
+              <div>MBBS, MS-Orthopedics</div>
+              <div>Joint Replacement &amp; Spine Surgeon</div>
+            </div>
           </div>
-          <div className="qr-dummy" style={{ padding: '8px' }}>
-            <img src="/qr2_left.png" alt="QR 2 Left" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-          </div>
-          <div className="qr-dummy" style={{ padding: '8px' }}>
-            <img src="/qr3_left.png" alt="QR 3 Left" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-          </div>
-        </div>
-      </div>
 
-      {/* CENTER SECTION - DYNAMIC VIDEO LOOP */}
-      <div className="video-section">
-        {videos.length > 0 ? (
-          videos.map((src, index) => {
-            const isCurrent = index === currentVideoIndex;
-            const isNext = index === (currentVideoIndex + 1) % videos.length;
-            
-            return (
-            <video 
-              key={src}
-              ref={el => videoRefs.current[index] = el}
-              src={src} 
-              className="bg-video"
-              style={{
-                opacity: isCurrent ? 1 : 0,
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-                transition: 'opacity 0.8s ease-in-out',
-                zIndex: isCurrent ? 1 : 0,
-                pointerEvents: 'none'
-              }}
-              muted={false}
-              playsInline
-              preload={isCurrent || isNext ? "auto" : "metadata"}
-              disableRemotePlayback
-              onEnded={() => {
-                if (isCurrent) handleVideoEnded();
-              }}
-              onError={() => {
-                if (isCurrent) handleVideoEnded();
-              }}
-            />
-          )})
-        ) : (
-          <div className="bg-video" style={{ backgroundColor: 'transparent' }}></div>
-        )}
-        <div className="video-overlay"></div>
-      </div>
+          <div className="queue-list">
+            {departments.filter(dep => dep.id === 'ORTHOPEDICS').map((dep) => (
+              <div
+                key={dep.id}
+                className={`opd-panel opd-large ${dep.isCalling ? 'active-calling' : ''}`}
+              >
+                {dep.isCalling && <Volume2 className="speaker-icon" size={24} />}
 
-      {/* RIGHT SECTION - OPD 2 & 3 */}
-      <div className="right-sidebar">
-        {/* Original Branding */}
-        <div className="hospital-branding">
-          <div className="hospital-logo">
-            <img src="/logo.png" alt="AR Hospital Logo" onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'block'; }} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-            <div style={{ display: 'none', color: '#8c1538', fontWeight: 'bold' }}>AR</div>
-          </div>
-        </div>
-
-        <div className="queue-list">
-          {departments.filter(dep => dep.id !== 'ORTHOPEDICS').map((dep) => (
-            <div 
-              key={dep.id} 
-              className={`opd-panel ${dep.isCalling ? 'active-calling' : ''}`}
-            >
-              {dep.isCalling && <Volume2 className="speaker-icon" size={24} />}
-              
-              <div className="opd-header">
-                <div className="department-name" style={{ color: '#8C1538' }}>
-                  {dep.opdNumber} {dep.specialization && dep.specialization !== "N/A" ? `(${dep.specialization.toUpperCase()})` : ""}
+                <div className="opd-header">
+                  <div className="department-name">{dep.opdNumber} - {dep.name}</div>
+                  <div className={`status-badge ${dep.isCalling ? '' : 'serving'}`}>
+                    {activeTimers[dep.opdNumber] ? 'DOCTOR IN OT' : (dep.doctorStatus === 'AWAY' ? 'DOCTOR IS AWAY' : (dep.doctorStatus === 'HOLIDAY' ? 'DOCTOR ON HOLIDAY' : (dep.isCalling ? 'NOW CALLING' : (dep.currentToken ? 'SERVING' : 'NO QUEUE'))))}
+                  </div>
                 </div>
-                <div className={`status-badge ${dep.isCalling ? '' : 'serving'}`}>
-                  {activeTimers[dep.opdNumber] ? 'DOCTOR IN OT' : (dep.doctorStatus === 'AWAY' ? 'DOCTOR IS AWAY' : (dep.doctorStatus === 'HOLIDAY' ? 'DOCTOR ON HOLIDAY' : (dep.isCalling ? 'NOW CALLING' : (dep.currentToken ? 'SERVING' : 'NO QUEUE'))))}
-                </div>
-              </div>
 
-              {/* Dynamic Doctor Name */}
-              {dep.doctor && dep.doctor !== "N/A" && (
-                <div style={{ color: '#000000', fontSize: '1rem', fontWeight: 'bold', marginBottom: '0.5rem', marginTop: '-0.5rem' }}>
-                  {dep.doctor.toUpperCase()}
-                </div>
-              )}
-
-              {activeTimers[dep.opdNumber] ? (
-                 <div className="token-display slide-up">
-                   <div className="current-token-area">
-                     <div className="token-label" style={{ color: '#ef4444' }}>DOCTOR IN OT</div>
-                     <div className="patient-name">QUEUE PAUSED</div>
-                   </div>
-                 </div>
-              ) : dep.doctorStatus === 'AWAY' ? (
-                 <div className="token-display slide-up">
-                   <div className="current-token-area">
-                     <div className="token-label" style={{ color: '#f97316' }}>DOCTOR IS AWAY</div>
-                     <div className="patient-name">QUEUE PAUSED</div>
-                   </div>
-                 </div>
-              ) : dep.doctorStatus === 'HOLIDAY' ? (
-                 <div className="token-display slide-up">
-                   <div className="current-token-area">
-                     <div className="token-label" style={{ color: '#a855f7' }}>DOCTOR ON HOLIDAY</div>
-                     <div className="patient-name" style={{ fontSize: '1.2rem' }}>NO PATIENTS CAN BE SERVED</div>
-                   </div>
-                 </div>
-              ) : (
-                <div className="token-display slide-up" key={dep.currentToken?.token || 'empty'}>
-                  <div className="current-token-area">
-                    <div className={`token-label ${dep.currentToken?.isEmergency ? 'text-red-500 font-bold' : ''}`}>
-                      {dep.currentToken?.isEmergency ? 'EMERGENCY' : 'NOW CALLING'}
+                {activeTimers[dep.opdNumber] ? (
+                  <div className="token-display slide-up">
+                    <div className="current-token-area">
+                      <div className="token-label" style={{ color: '#ef4444' }}>DOCTOR IN OT</div>
+                      <div className="patient-name">QUEUE PAUSED</div>
                     </div>
-                    <div className="token-number" style={{ color: dep.currentToken?.isEmergency ? '#ef4444' : '' }}>{dep.currentToken ? dep.currentToken.token : '---'}</div>
-                    <div className="patient-name">{dep.currentToken ? dep.currentToken.patientName : 'Available'}</div>
                   </div>
-                </div>
-              )}
+                ) : dep.doctorStatus === 'AWAY' ? (
+                  <div className="token-display slide-up">
+                    <div className="current-token-area">
+                      <div className="token-label" style={{ color: '#f97316' }}>DOCTOR IS AWAY</div>
+                      <div className="patient-name">QUEUE PAUSED</div>
+                    </div>
+                  </div>
+                ) : dep.doctorStatus === 'HOLIDAY' ? (
+                  <div className="token-display slide-up">
+                    <div className="current-token-area">
+                      <div className="token-label" style={{ color: '#a855f7' }}>DOCTOR ON HOLIDAY</div>
+                      <div className="patient-name" style={{ fontSize: '1.5rem' }}>NO PATIENTS CAN BE SERVED</div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="token-display slide-up" key={dep.currentToken?.token || 'empty'}>
+                    <div className="current-token-area">
+                      <div className="token-label">NOW CALLING</div>
+                      <div className="token-number">{dep.currentToken ? dep.currentToken.token : '---'}</div>
+                      <div className="patient-name">{dep.currentToken ? dep.currentToken.patientName : 'Available'}</div>
+                    </div>
+                  </div>
+                )}
 
-              {/* Next 2 in Queue or Timer */}
-              {activeTimers[dep.opdNumber] ? (
-                <div className="queue-extended ot-timer-container" style={{ marginTop: '1rem', paddingTop: '1rem' }}>
-                  <div className="queue-header" style={{ color: '#ef4444' }}>RESUMING IN</div>
-                  <div className="ot-timer-display" style={{ fontSize: '4rem', fontWeight: 'bold', textAlign: 'center', padding: '1rem', color: '#ef4444', fontFamily: 'monospace' }}>
-                    {formatTimeLeft(activeTimers[dep.opdNumber])}
+                {/* Next 5 in Queue or Timer */}
+                {activeTimers[dep.opdNumber] ? (
+                  <div className="queue-extended ot-timer-container">
+                    <div className="queue-header" style={{ color: '#ef4444' }}>RESUMING IN</div>
+                    <div className="ot-timer-display" style={{ fontSize: '4rem', fontWeight: 'bold', textAlign: 'center', padding: '1rem', color: '#ef4444', fontFamily: 'monospace' }}>
+                      {formatTimeLeft(activeTimers[dep.opdNumber])}
+                    </div>
                   </div>
-                </div>
-              ) : (dep.doctorStatus === 'AWAY' || dep.doctorStatus === 'HOLIDAY') ? (
-                <div className="queue-extended" style={{ marginTop: '1rem', paddingTop: '1rem', opacity: 0.5 }}>
-                  <div className="queue-header">UPCOMING QUEUE (PAUSED)</div>
-                  <div className="queue-items">
-                    {dep.queue.map((q, idx) => (
-                      <div key={idx} className={`queue-item slide-up ${q.isAvailable ? 'available' : ''}`} style={{ animationDelay: `${idx * 0.1}s`, padding: '0.5rem 1rem' }}>
-                        <div className="q-token" style={{ fontSize: '1.2rem', width: 'auto', minWidth: '60px', color: q.isEmergency ? '#ef4444' : '' }}>{q.token}</div>
-                        <div className="q-name" style={{ color: q.isEmergency ? '#ef4444' : '' }}>{q.patientName}</div>
-                      </div>
-                    ))}
+                ) : (dep.doctorStatus === 'AWAY' || dep.doctorStatus === 'HOLIDAY') ? (
+                  <div className="queue-extended" style={{ opacity: 0.5 }}>
+                    <div className="queue-header">UPCOMING QUEUE (PAUSED)</div>
+                    <div className="queue-items">
+                      {dep.queue.map((q, idx) => (
+                        <div key={idx} className={`queue-item slide-up ${q.isAvailable ? 'available' : ''}`} style={{ animationDelay: `${idx * 0.1}s` }}>
+                          <div className="q-token" style={{ color: q.isEmergency ? '#ef4444' : '' }}>{q.token}</div>
+                          <div className="q-name" style={{ color: q.isEmergency ? '#ef4444' : '' }}>{q.patientName}</div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              ) : (
-                <div className="queue-extended" style={{ marginTop: '1rem', paddingTop: '1rem' }}>
-                  <div className="queue-header">UPCOMING QUEUE</div>
-                  <div className="queue-items">
-                    {dep.queue.map((q, idx) => (
-                      <div key={idx} className={`queue-item slide-up ${q.isAvailable ? 'available' : ''}`} style={{ animationDelay: `${idx * 0.1}s`, padding: '0.5rem 1rem' }}>
-                        <div className="q-token" style={{ fontSize: '1.2rem', width: 'auto', minWidth: '60px', color: q.isEmergency ? '#ef4444' : '' }}>{q.token}</div>
-                        <div className="q-name" style={{ color: q.isEmergency ? '#ef4444' : '' }}>{q.patientName}</div>
-                      </div>
-                    ))}
+                ) : (
+                  <div className="queue-extended">
+                    <div className="queue-header">UPCOMING QUEUE</div>
+                    <div className="queue-items">
+                      {dep.queue.map((q, idx) => (
+                        <div key={idx} className={`queue-item slide-up ${q.isAvailable ? 'available' : ''}`} style={{ animationDelay: `${idx * 0.1}s` }}>
+                          <div className="q-token" style={{ color: q.isEmergency ? '#ef4444' : '' }}>{q.token}</div>
+                          <div className="q-name" style={{ color: q.isEmergency ? '#ef4444' : '' }}>{q.patientName}</div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* QR CODES - LEFT SIDEBAR */}
+          <div className="qr-container">
+            <div className="qr-dummy" style={{ padding: '8px' }}>
+              <img src="/qr1_left.png" alt="QR 1 Left" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
             </div>
-          ))}
+            <div className="qr-dummy" style={{ padding: '8px' }}>
+              <img src="/qr2_left.png" alt="QR 2 Left" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+            </div>
+            <div className="qr-dummy" style={{ padding: '8px' }}>
+              <img src="/qr3_left.png" alt="QR 3 Left" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+            </div>
+          </div>
         </div>
 
-        {/* QR CODES - RIGHT SIDEBAR */}
-        <div className="qr-container">
-          <div className="qr-dummy" style={{ padding: '8px' }}>
-            <img src="/qr1_right.png" alt="QR 1 Right" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+        {/* CENTER SECTION - DYNAMIC VIDEO LOOP */}
+        <div className="video-section">
+          {videos.length > 0 ? (
+            videos.map((src, index) => {
+              const isCurrent = index === currentVideoIndex;
+              const isNext = index === (currentVideoIndex + 1) % videos.length;
+
+              return (
+                <video
+                  key={src}
+                  ref={el => videoRefs.current[index] = el}
+                  src={src}
+                  className="bg-video"
+                  style={{
+                    opacity: isCurrent ? 1 : 0,
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'contain',
+                    transition: 'opacity 0.8s ease-in-out',
+                    zIndex: isCurrent ? 1 : 0,
+                    pointerEvents: 'none'
+                  }}
+                  muted={false}
+                  playsInline
+                  preload="auto"
+                  disableRemotePlayback
+                  onEnded={() => {
+                    if (isCurrent) handleVideoEnded();
+                  }}
+                  onError={() => {
+                    if (isCurrent) handleVideoEnded();
+                  }}
+                />
+              )
+            })
+          ) : (
+            <div className="bg-video" style={{ backgroundColor: 'transparent' }}></div>
+          )}
+          <div className="video-overlay"></div>
+        </div>
+
+        {/* RIGHT SECTION - OPD 2 & 3 */}
+        <div className="right-sidebar">
+          {/* Original Branding */}
+          <div className="hospital-branding">
+            <div className="hospital-logo">
+              <img src="/logo.png" alt="AR Hospital Logo" onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'block'; }} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+              <div style={{ display: 'none', color: '#8c1538', fontWeight: 'bold' }}>AR</div>
+            </div>
           </div>
-          <div className="qr-dummy" style={{ padding: '8px' }}>
-            <img src="/qr2_right.png" alt="QR 2 Right" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+
+          <div className="queue-list">
+            {departments.filter(dep => dep.id !== 'ORTHOPEDICS').map((dep) => (
+              <div
+                key={dep.id}
+                className={`opd-panel ${dep.isCalling ? 'active-calling' : ''} ${dep.opdNumber === 'OPD 3' ? 'opd3-panel' : ''}`}
+              >
+                {dep.isCalling && <Volume2 className="speaker-icon" size={24} />}
+
+                <div className="opd-header">
+                  <div className="department-name" style={{ color: '#8C1538' }}>
+                    {dep.opdNumber} {dep.specialization && dep.specialization !== "N/A" ? `(${dep.specialization.toUpperCase()})` : ""}
+                  </div>
+                  <div className={`status-badge ${dep.isCalling ? '' : 'serving'}`}>
+                    {activeTimers[dep.opdNumber] ? 'DOCTOR IN OT' : (dep.doctorStatus === 'AWAY' ? 'DOCTOR IS AWAY' : (dep.doctorStatus === 'HOLIDAY' ? 'DOCTOR ON HOLIDAY' : (dep.isCalling ? 'NOW CALLING' : (dep.currentToken ? 'SERVING' : 'NO QUEUE'))))}
+                  </div>
+                </div>
+
+                {/* Dynamic Doctor Name */}
+                {dep.doctor && dep.doctor !== "N/A" && (
+                  <div style={{ color: '#000000', fontSize: '1rem', fontWeight: 'bold', marginBottom: '0.5rem', marginTop: '-0.5rem' }}>
+                    {dep.doctor.toUpperCase()}
+                  </div>
+                )}
+
+                {activeTimers[dep.opdNumber] ? (
+                  <div className="token-display slide-up">
+                    <div className="current-token-area">
+                      <div className="token-label" style={{ color: '#ef4444' }}>DOCTOR IN OT</div>
+                      <div className="patient-name">QUEUE PAUSED</div>
+                    </div>
+                  </div>
+                ) : dep.doctorStatus === 'AWAY' ? (
+                  <div className="token-display slide-up">
+                    <div className="current-token-area">
+                      <div className="token-label" style={{ color: '#f97316' }}>DOCTOR IS AWAY</div>
+                      <div className="patient-name">QUEUE PAUSED</div>
+                    </div>
+                  </div>
+                ) : dep.doctorStatus === 'HOLIDAY' ? (
+                  <div className="token-display slide-up">
+                    <div className="current-token-area">
+                      <div className="token-label" style={{ color: '#a855f7' }}>DOCTOR ON HOLIDAY</div>
+                      <div className="patient-name" style={{ fontSize: '1.2rem' }}>NO PATIENTS CAN BE SERVED</div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="token-display slide-up" key={dep.currentToken?.token || 'empty'}>
+                    <div className="current-token-area">
+                      <div className={`token-label ${dep.currentToken?.isEmergency ? 'text-red-500 font-bold' : ''}`}>
+                        {dep.currentToken?.isEmergency ? 'EMERGENCY' : 'NOW CALLING'}
+                      </div>
+                      <div className="token-number" style={{ color: dep.currentToken?.isEmergency ? '#ef4444' : '' }}>{dep.currentToken ? dep.currentToken.token : '---'}</div>
+                      <div className="patient-name">{dep.currentToken ? dep.currentToken.patientName : 'Available'}</div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Next 2 in Queue or Timer */}
+                {activeTimers[dep.opdNumber] ? (
+                  <div className="queue-extended ot-timer-container" style={{ marginTop: '1rem', paddingTop: '1rem' }}>
+                    <div className="queue-header" style={{ color: '#ef4444' }}>RESUMING IN</div>
+                    <div className="ot-timer-display" style={{ fontSize: '4rem', fontWeight: 'bold', textAlign: 'center', padding: '1rem', color: '#ef4444', fontFamily: 'monospace' }}>
+                      {formatTimeLeft(activeTimers[dep.opdNumber])}
+                    </div>
+                  </div>
+                ) : (dep.doctorStatus === 'AWAY' || dep.doctorStatus === 'HOLIDAY') ? (
+                  <div className="queue-extended" style={{ marginTop: '1rem', paddingTop: '1rem', opacity: 0.5 }}>
+                    <div className="queue-header">UPCOMING QUEUE (PAUSED)</div>
+                    <div className="queue-items">
+                      {dep.queue.map((q, idx) => (
+                        <div key={idx} className={`queue-item slide-up ${q.isAvailable ? 'available' : ''}`} style={{ animationDelay: `${idx * 0.1}s`, padding: '0.5rem 1rem' }}>
+                          <div className="q-token" style={{ fontSize: '1.2rem', width: 'auto', minWidth: '60px', color: q.isEmergency ? '#ef4444' : '' }}>{q.token}</div>
+                          <div className="q-name" style={{ color: q.isEmergency ? '#ef4444' : '' }}>{q.patientName}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="queue-extended" style={{ marginTop: '1rem', paddingTop: '1rem' }}>
+                    <div className="queue-header">UPCOMING QUEUE</div>
+                    <div className="queue-items">
+                      {dep.queue.map((q, idx) => (
+                        <div key={idx} className={`queue-item slide-up ${q.isAvailable ? 'available' : ''}`} style={{ animationDelay: `${idx * 0.1}s`, padding: '0.5rem 1rem' }}>
+                          <div className="q-token" style={{ fontSize: '1.2rem', width: 'auto', minWidth: '60px', color: q.isEmergency ? '#ef4444' : '' }}>{q.token}</div>
+                          <div className="q-name" style={{ color: q.isEmergency ? '#ef4444' : '' }}>{q.patientName}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
-          <div className="qr-dummy" style={{ padding: '8px' }}>
-            <img src="/qr3_right.png" alt="QR 3 Right" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+
+          {/* QR CODES - RIGHT SIDEBAR */}
+          <div className="qr-container">
+            <div className="qr-dummy" style={{ padding: '8px' }}>
+              <img src="/qr1_right.png" alt="QR 1 Right" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+            </div>
+            <div className="qr-dummy" style={{ padding: '8px' }}>
+              <img src="/qr2_right.png" alt="QR 2 Right" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+            </div>
+            <div className="qr-dummy" style={{ padding: '8px' }}>
+              <img src="/qr3_right.png" alt="QR 3 Right" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+            </div>
           </div>
         </div>
       </div>
-    </div>
     </div>
   );
 }

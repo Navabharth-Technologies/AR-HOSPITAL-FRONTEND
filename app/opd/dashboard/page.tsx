@@ -65,7 +65,11 @@ export default function OPDDashboard() {
       
       const handleStatusUpdate = (data: any) => {
         if (data.opdId === opdNumber) {
-          setDoctorStatus(data.status);
+          if (data.pendingStatus) {
+            setDoctorStatus(data.pendingStatus);
+          } else {
+            setDoctorStatus(data.status);
+          }
         }
       };
       
@@ -109,7 +113,11 @@ export default function OPDDashboard() {
         const res = await fetch(`https://ar-hospital-backend-hqagfqdbbxguehdb.centralindia-01.azurewebsites.net/api/opd/${opdNumber}/status`);
         const data = await res.json();
         if (data.success) {
-          setDoctorStatus(data.status);
+          if (data.pendingStatus) {
+            setDoctorStatus(data.pendingStatus);
+          } else {
+            setDoctorStatus(data.status);
+          }
         } else {
           setDoctorStatus("AVAILABLE");
         }
@@ -206,11 +214,20 @@ export default function OPDDashboard() {
     }
 
     try {
-      await fetch(`https://ar-hospital-backend-hqagfqdbbxguehdb.centralindia-01.azurewebsites.net/api/opd/${opdNumber}/status`, {
+      const res = await fetch(`https://ar-hospital-backend-hqagfqdbbxguehdb.centralindia-01.azurewebsites.net/api/opd/${opdNumber}/status`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: targetStatus })
       });
+      const data = await res.json();
+      if (data.pendingStatus) {
+        setConfirmModal({
+          isOpen: true,
+          statusToClear: null,
+          message: `${targetStatus === "AWAY" ? "Away" : "Holiday"} Status Pending. Will trigger after current patient.`,
+          type: "info"
+        });
+      }
     } catch (err) {
       console.error("Failed to update status", err);
     }

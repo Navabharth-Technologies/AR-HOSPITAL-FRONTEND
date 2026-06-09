@@ -7,7 +7,7 @@ import Link from 'next/link';
 const API_BASE = "https://ar-hospital-backend-hqagfqdbbxguehdb.centralindia-01.azurewebsites.net"; // Replace with your production URL or use an env variable
 
 export default function AdminVideos() {
-  const [videos, setVideos] = useState([]);
+  const [videos, setVideos] = useState<any[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState('');
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -30,7 +30,7 @@ export default function AdminVideos() {
     fetchVideos();
   }, []);
 
-  const handleFileUpload = async (e) => {
+  const handleFileUpload = async (e: any) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
@@ -73,7 +73,7 @@ export default function AdminVideos() {
     }, 4000);
   };
 
-  const toggleActive = async (id, currentStatus) => {
+  const toggleActive = async (id: any, currentStatus: any) => {
     try {
       await fetch(`${API_BASE}/api/videos/${id}`, {
         method: 'PUT',
@@ -84,7 +84,7 @@ export default function AdminVideos() {
     } catch (e) { console.error(e); }
   };
 
-  const updateOrder = async (id, currentOrder, delta) => {
+  const updateOrder = async (id: any, currentOrder: any, delta: any) => {
     try {
       await fetch(`${API_BASE}/api/videos/${id}`, {
         method: 'PUT',
