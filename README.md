@@ -171,7 +171,7 @@ android/app/build/outputs/bundle/release/
 
 ## 🤝 Contribution & Maintenance
 
-This project is maintained by the <h4>Navabharath Technologies Development Team</h4> For support or feedback, please contact the repository administrator.
+This project is maintained by the **Navabharath Technologies Development Team**. For support or feedback, please contact the repository administrator.
 
  
-<br> © 2026 Tokensboy. All Rights Reserved.
+<br> © 2026 Navabharath Technologies. All Rights Reserved.
