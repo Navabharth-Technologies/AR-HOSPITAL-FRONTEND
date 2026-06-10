@@ -4,11 +4,11 @@ Welcome to the **AR Hospital Frontend Application Suite**, a modern healthcare o
 
 The suite consists of three interconnected components:
 
-<h3>🏥 Receptionist Portal:</h3> Manage patient registrations, token generation, queue creation, and media uploads.
+<h4>🏥 Receptionist Portal:</h4> Manage patient registrations, token generation, queue creation, and media uploads.
 
-<h3>👨‍⚕️ OPD Handler Portal:</h3> Control patient calling, queue progression, consultations, and AI announcements.
+<h4>👨‍⚕️ OPD Handler Portal:</h4> Control patient calling, queue progression, consultations, and AI announcements.
 
-<h3>📺 Display Panel:</h3> Real-time patient queue display, token tracking, and video advertisement playback.
+<h4>📺 Display Panel:</h4> Real-time patient queue display, token tracking, and video advertisement playback.
 
 ### 📂 Project Structure
 
@@ -49,7 +49,7 @@ The suite consists of three interconnected components:
 * OPD queue status
 * Live synchronization
 
-### AI Announcement Controls
+<h5>AI Announcement Controls</h5>
 
 * Trigger patient announcements
 * Monitor announcement status
@@ -87,7 +87,7 @@ The suite consists of three interconnected components:
 * Smooth animations
 * Multi-device compatibility
 
-### Optimized Workflows
+<h4>Optimized Workflows</h4>
 
 * Fast patient registration
 * One-click queue actions
@@ -171,7 +171,7 @@ android/app/build/outputs/bundle/release/
 
 ## 🤝 Contribution & Maintenance
 
-This project is maintained by the <h4>Navabharath Technologies Development Team(Tokensboy).</h4> For support or feedback, please contact the repository administrator.
+This project is maintained by the <h4>Navabharath Technologies Development Team(Tokensboy)</h4>. For support or feedback, please contact the repository administrator.
 
  
 <br> © 2026 Tokensboy. All Rights Reserved.
