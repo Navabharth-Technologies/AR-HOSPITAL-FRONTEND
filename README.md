@@ -17,7 +17,7 @@ The suite consists of three interconnected components:
 | Receptionist Portal | ./src/screens/receptionist | React Native              | Patient registration, token management, queue administration |
 | OPD Handler Portal  | ./src/screens/opd          | React Native              | Queue handling, patient calling, and consultation controls   |
 | Display Panel       | ./src/screens/display      | React Native / Android TV | Real-time token display and digital signage                  |
-| Services            | ./src/services             | Axios / Socket.io         | API integration and real-time communication                  |
+| Services            | ./src/services             | Socket.io                 | API integration and real-time communication                  |
 | Components          | ./src/components           | React Native              | Shared UI components and reusable modules                    |
 
 ### ✨ Core Features
@@ -171,7 +171,7 @@ android/app/build/outputs/bundle/release/
 
 ## 🤝 Contribution & Maintenance
 
-This project is maintained by the <h4>Navabharath Technologies Development Team(Tokensboy)</h4>. For support or feedback, please contact the repository administrator.
+This project is maintained by the <h4>Navabharath Technologies Development Team</h4> For support or feedback, please contact the repository administrator.
 
  
 <br> © 2026 Tokensboy. All Rights Reserved.
