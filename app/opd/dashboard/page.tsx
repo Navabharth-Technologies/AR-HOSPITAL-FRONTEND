@@ -33,7 +33,7 @@ export default function OPDDashboard() {
   const [otOpd, setOtOpd] = useState("OPD 1");
 
   // Confirm Modal State
-  const [confirmModal, setConfirmModal] = useState<{isOpen: boolean, statusToClear: string | null, message: string, type: "confirm" | "info"}>({
+  const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean, statusToClear: string | null, message: string, type: "confirm" | "info" }>({
     isOpen: false,
     statusToClear: null,
     message: "",
@@ -56,13 +56,13 @@ export default function OPDDashboard() {
   useEffect(() => {
     if (socket) {
       socket.emit("join_opd", opdNumber);
-      
+
       const handleQueueUpdate = () => {
         fetchPatients();
       };
-      
+
       socket.on("queue_updated", handleQueueUpdate);
-      
+
       const handleStatusUpdate = (data: any) => {
         if (data.opdId === opdNumber) {
           if (data.pendingStatus) {
@@ -72,7 +72,7 @@ export default function OPDDashboard() {
           }
         }
       };
-      
+
       socket.on("doctor_status_changed", handleStatusUpdate);
 
       const handleTimerEnded = (data: any) => {
@@ -80,7 +80,7 @@ export default function OPDDashboard() {
           setDoctorStatus("AVAILABLE");
         }
       };
-      
+
       socket.on("ot_timer_ended", handleTimerEnded);
 
       return () => {
@@ -107,7 +107,7 @@ export default function OPDDashboard() {
   useEffect(() => {
     fetchPatients();
     setOtOpd(opdNumber);
-    
+
     const checkStatus = async () => {
       try {
         const res = await fetch(`https://ar-hospital-backend-hqagfqdbbxguehdb.centralindia-01.azurewebsites.net/api/opd/${opdNumber}/status`);
@@ -196,7 +196,7 @@ export default function OPDDashboard() {
         type: "confirm"
       });
       return;
-    } 
+    }
     else if (doctorStatus === "AWAY" || doctorStatus === "HOLIDAY") {
       if (clickedStatus === "AVAILABLE") return;
     }
@@ -263,7 +263,7 @@ export default function OPDDashboard() {
 
   return (
     <div className="min-h-[100dvh] w-full overflow-x-hidden flex flex-col bg-slate-50 text-slate-900 font-sans selection:bg-teal-500/30">
-      
+
       {/* Abstract Background Elements */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <div className="absolute top-[20%] left-[-10%] w-[30%] h-[30%] bg-teal-200/50 rounded-full blur-[100px] mix-blend-multiply" />
@@ -287,8 +287,8 @@ export default function OPDDashboard() {
         {/* Global Status Toggle & OPD Selector */}
         <div className="flex flex-wrap justify-center items-center gap-4 xl:gap-0 xl:space-x-6 mt-2 xl:mt-0">
           <div className="relative group">
-            <select 
-              value={opdNumber} 
+            <select
+              value={opdNumber}
               onChange={(e) => setOpdNumber(e.target.value)}
               className="bg-white text-teal-700 text-sm font-bold px-6 py-3 rounded-xl border border-teal-200 outline-none appearance-none cursor-pointer focus:border-teal-500 transition-all shadow-sm"
             >
@@ -309,7 +309,7 @@ export default function OPDDashboard() {
             >
               <Activity className="w-4 h-4" /> <span>Active</span>
             </motion.button>
-            
+
             <motion.button
               whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
               onClick={() => handleDoctorStatus("AWAY")}
@@ -338,13 +338,13 @@ export default function OPDDashboard() {
               {/* OT Dropdown Menu */}
               <AnimatePresence>
                 {showOTMenu && (
-                  <motion.div 
+                  <motion.div
                     initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 5 }}
                     className="absolute right-0 top-full mt-1 bg-white border border-slate-200 rounded-2xl p-6 w-72 shadow-xl z-[999] flex flex-col space-y-5"
                   >
                     <div>
                       <label className="text-[10px] text-slate-500 font-bold tracking-widest mb-1.5 block">SELECT TARGET OPD</label>
-                      <select 
+                      <select
                         value={otOpd} onChange={(e) => setOtOpd(e.target.value)}
                         className="w-full bg-slate-50 text-slate-900 text-sm px-4 py-3 rounded-xl border border-slate-200 outline-none focus:border-red-500 transition-all appearance-none cursor-pointer"
                       >
@@ -355,7 +355,7 @@ export default function OPDDashboard() {
                     </div>
                     <div>
                       <label className="text-[10px] text-slate-500 font-bold tracking-widest mb-1.5 block">ESTIMATED DURATION</label>
-                      <select 
+                      <select
                         value={otDuration} onChange={(e) => setOtDuration(Number(e.target.value))}
                         className="w-full bg-slate-50 text-slate-900 text-sm px-4 py-3 rounded-xl border border-slate-200 outline-none focus:border-red-500 transition-all appearance-none cursor-pointer"
                       >
@@ -364,7 +364,7 @@ export default function OPDDashboard() {
                         ))}
                       </select>
                     </div>
-                    <button 
+                    <button
                       onClick={submitOTTimer}
                       className="w-full mt-2 bg-red-600 border border-red-600 text-white rounded-xl py-3 font-bold tracking-widest hover:bg-red-700 transition-all shadow-md shadow-red-600/20"
                     >
@@ -388,7 +388,7 @@ export default function OPDDashboard() {
 
       {/* Main Content */}
       <main className="flex-1 p-4 sm:p-6 md:p-8 max-w-5xl mx-auto w-full relative z-10">
-        
+
         {/* Status Banners */}
         {doctorStatus === "OT" && (
           <div className="mb-8 w-full bg-red-50 border border-red-200 rounded-xl p-4 flex items-center justify-center space-x-3 text-red-600 shadow-sm">
@@ -453,7 +453,7 @@ export default function OPDDashboard() {
                           {patient.IsEmergency && <span className="mr-2 animate-pulse text-red-500">🚨</span>}
                           TOKEN: {patient.IsEmergency && patient.EmergencyTokenNumber ? `EMR${patient.EmergencyTokenNumber.toString().padStart(3, '0')}` : (patient.OpdTokenNumber ? patient.OpdTokenNumber.toString() : patient.PatientID.toString().padStart(4, '0'))}
                         </div>
-                        
+
                         {patient.QueueStatus === 'HOLD' && (
                           <div className="bg-amber-100 text-amber-700 border border-amber-200 px-3 py-1 rounded text-[10px] font-bold tracking-widest flex items-center uppercase">
                             <PauseCircle className="w-3 h-3 mr-1.5" /> PRIORITY HOLD
@@ -465,13 +465,13 @@ export default function OPDDashboard() {
                           </div>
                         )}
                       </div>
-                      
+
                       <h3 className={`text-xl sm:text-2xl font-bold tracking-wide mb-1 ${patient.IsEmergency ? 'text-red-600' : 'text-slate-900'}`}>
                         {patient.PatientName}
                       </h3>
-                      
+
                       <div className="flex flex-wrap items-center gap-4 text-slate-500 text-sm font-medium">
-                        <span className="flex items-center"><Clock className="w-3 h-3 mr-1 text-slate-400"/> {patient.Age}y</span>
+                        <span className="flex items-center"><Clock className="w-3 h-3 mr-1 text-slate-400" /> {patient.Age}y</span>
                         <span className="text-slate-300">•</span>
                         <span>{patient.Gender}</span>
                         <span className="text-slate-300">•</span>
@@ -510,7 +510,7 @@ export default function OPDDashboard() {
                           <span className="text-[9px] font-bold tracking-widest uppercase">HOLD</span>
                         </motion.button>
                       )}
-                      
+
                       <motion.button
                         whileHover={{ scale: (doctorStatus !== "AVAILABLE" && !patient.IsActive) ? 1 : 1.05 }} whileTap={{ scale: (doctorStatus !== "AVAILABLE" && !patient.IsActive) ? 1 : 0.95 }}
                         disabled={doctorStatus !== "AVAILABLE" && !patient.IsActive}
@@ -548,11 +548,11 @@ export default function OPDDashboard() {
       {/* Custom Confirm Modal */}
       <AnimatePresence>
         {confirmModal.isOpen && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="fixed inset-0 bg-slate-900/40 backdrop-blur-md z-[9999] flex items-center justify-center p-4"
           >
-            <motion.div 
+            <motion.div
               initial={{ scale: 0.95, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0, y: 20 }}
               className="bg-white border border-slate-200 rounded-2xl p-8 max-w-md w-full shadow-2xl relative overflow-hidden"
             >
@@ -566,14 +566,14 @@ export default function OPDDashboard() {
               </p>
               <div className="flex justify-end gap-4">
                 {confirmModal.type === "confirm" && (
-                  <button 
+                  <button
                     onClick={() => setConfirmModal({ isOpen: false, statusToClear: null, message: "", type: "confirm" })}
                     className="px-6 py-2 rounded-xl text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-all font-semibold"
                   >
                     Abort
                   </button>
                 )}
-                <button 
+                <button
                   onClick={() => {
                     if (confirmModal.type === "confirm") {
                       handleConfirmResume(confirmModal.statusToClear);

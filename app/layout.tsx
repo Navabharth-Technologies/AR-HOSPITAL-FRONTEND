@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { CapgoProvider } from "./providers/CapgoProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -26,7 +27,9 @@ export default function RootLayout({
           <div className="absolute top-[20%] right-[-10%] w-[30rem] h-[30rem] bg-medical-maroon rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-blob animation-delay-2000"></div>
           <div className="absolute bottom-[-20%] left-[20%] w-[40rem] h-[40rem] bg-medical-silver rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
         </div>
-        {children}
+        <CapgoProvider>
+          {children}
+        </CapgoProvider>
       </body>
     </html>
   );

@@ -9,13 +9,15 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "build:exe": "next build && electron-builder --win"
+    "build:exe": "next build && electron-builder --win",
+    "deploy:ota": "next build && npx @capgo/cli bundle upload com.arhospital.app -v"
   },
   "dependencies": {
     "@capacitor-community/text-to-speech": "^8.0.0",
     "@capacitor/android": "^8.4.0",
     "@capacitor/cli": "^8.4.0",
     "@capacitor/core": "^8.4.0",
+    "@capgo/capacitor-updater": "^8.49.1",
     "clsx": "^2.1.1",
     "electron-serve": "^3.0.1",
     "framer-motion": "^12.40.0",
