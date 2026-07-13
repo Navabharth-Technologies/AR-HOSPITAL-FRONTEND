@@ -355,19 +355,20 @@ export default function ARDisplay() {
   }, [currentVideoIndex, videos]);
 
   return (
-    <div style={{ width: '100vw', height: '100vh', backgroundColor: '#000', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <div style={{ width: '100vw', height: '100vh', backgroundColor: '#000', overflow: 'hidden', position: 'relative' }}>
       <div
         className="app-container"
         style={{
           width: '1920px',
           height: '1080px',
-          transform: `scale(${scale})`,
+          position: 'absolute',
+          left: '50%',
+          top: '50%',
+          transform: `translate(-50%, -50%) scale(${scale})`,
           transformOrigin: 'center center',
           flexShrink: 0
         }}
       >
-
-
         {/* Hidden file input for uploading excel */}
         <input
           type="file"
@@ -380,16 +381,11 @@ export default function ARDisplay() {
 
         {/* LEFT SECTION - OPD 1 (Orthopedics) */}
         <div className="left-sidebar">
-          {/* New Branding for Dr. Madhuram Chowdry */}
+          {/* Original Branding */}
           <div className="hospital-branding" onClick={triggerUpload} title="Click to upload Excel">
             <div className="hospital-logo">
-              <img src="/dr-logo2.png" alt="Dr. Madhuram Chowdry Logo" onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'block'; }} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-              <div style={{ display: 'none', color: '#8c1538', fontWeight: 'bold' }}>Dr</div>
-            </div>
-            <div className="hospital-name" style={{ fontSize: '1.5rem' }}>Dr. Madhuram Chowdry</div>
-            <div style={{ textAlign: 'center', color: '#FFD700', fontSize: '0.85rem', fontWeight: '600', marginTop: '-0.2rem', lineHeight: '1.2', textTransform: 'uppercase' }}>
-              <div>MBBS, MS-Orthopedics</div>
-              <div>Joint Replacement &amp; Spine Surgeon</div>
+              <img src="/logo.png" alt="AR Hospital Logo" onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'block'; }} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+              <div style={{ display: 'none', color: '#8c1538', fontWeight: 'bold' }}>AR</div>
             </div>
           </div>
 
@@ -516,6 +512,7 @@ export default function ARDisplay() {
                     pointerEvents: 'none'
                   }}
                   muted={false}
+                  autoPlay={true}
                   playsInline
                   preload="auto"
                   disableRemotePlayback
