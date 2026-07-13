@@ -492,11 +492,14 @@ export default function ARDisplay() {
             videos.map((src, index) => {
               const isCurrent = index === currentVideoIndex;
               const isNext = index === (currentVideoIndex + 1) % videos.length;
+              
+              // Only render the current and next video to save TV memory and prevent freezing
+              if (!isCurrent && !isNext) return null;
 
               return (
                 <video
                   key={src}
-                  ref={el => videoRefs.current[index] = el}
+                  ref={el => { if (el) videoRefs.current[index] = el }}
                   src={src}
                   className="bg-video"
                   style={{
@@ -512,9 +515,9 @@ export default function ARDisplay() {
                     pointerEvents: 'none'
                   }}
                   muted={false}
-                  autoPlay={true}
+                  autoPlay={isCurrent}
                   playsInline
-                  preload="auto"
+                  preload={isCurrent ? "auto" : "metadata"}
                   disableRemotePlayback
                   onEnded={() => {
                     if (isCurrent) handleVideoEnded();
