@@ -23,8 +23,8 @@ export function CapgoProvider({ children }: { children: React.ReactNode }) {
         const downloadUrl = asset.browser_download_url;
 
         // Get currently running version
-        const currentBundle = await CapacitorUpdater.current();
-        const currentVersion = currentBundle?.version || '';
+        const currentResult = await CapacitorUpdater.current();
+        const currentVersion = currentResult?.bundle?.version || currentResult?.bundle?.id || '';
 
         // If there's a new version on GitHub, download and apply it
         if (latestVersion && latestVersion !== currentVersion) {
